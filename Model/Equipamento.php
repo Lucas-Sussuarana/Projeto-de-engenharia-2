@@ -9,9 +9,9 @@ class Equipamento {
     private $obs_equipamento;
     private $id_adm_alteracao;
     private $data_entrada;
-    private $data_saida;
 
-    public function __construct($nome, $tipo, $status, $patrimonio, $obs, $id_adm, $data_entrada, $data_saida) {
+
+    public function __construct($nome, $tipo, $status, $patrimonio, $obs, $id_adm, $data_entrada,) {
         $this->nome_equipamento = $nome;
         $this->tipo_equipamento = $tipo;
         $this->status_equipamento = $status;
@@ -19,7 +19,6 @@ class Equipamento {
         $this->obs_equipamento = $obs;
         $this->id_adm_alteracao = $id_adm;
         $this->data_entrada = $data_entrada;
-        $this->data_saida = $data_saida;
     }
 
     // Métodos GET e SET
@@ -84,17 +83,9 @@ class Equipamento {
         $this->data_entrada = $data_entrada;
     }
 
-    public function getDataSaida() {
-        return $this->data_saida;
-    }
-
-    public function setDataSaida($data_saida) {
-        $this->data_saida = $data_saida;
-    }
-
     // Método para cadastrar equipamento
     public function cadastrar($conn) {
-        $sql = "INSERT INTO equipamentos (nome_equipamento, tipo_equipamento, status_equipamento, patrimonio_equipamento, obs_equipamento, id_adm_alteracao, data_entrada, data_saida)
+        $sql = "INSERT INTO equipamentos (nome_equipamento, tipo_equipamento, status_equipamento, patrimonio_equipamento, obs_equipamento, id_adm_alteracao, data_entrada)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(1, $this->nome_equipamento);
@@ -104,7 +95,7 @@ class Equipamento {
         $stmt->bindParam(5, $this->obs_equipamento);
         $stmt->bindParam(6, $this->id_adm_alteracao);
         $stmt->bindParam(7, $this->data_entrada);
-        $stmt->bindParam(8, $this->data_saida);
+
         $stmt->execute();
         $this->id = $conn->lastInsertId();
     }
@@ -124,7 +115,7 @@ class Equipamento {
                 $row['obs_equipamento'],
                 $row['id_adm_alteracao'],
                 $row['data_entrada'],
-                $row['data_saida']
+               
             );
             $equipamentos[] = $equipamento;
         }
@@ -152,7 +143,6 @@ class Equipamento {
                     obs_equipamento = ?, 
                     id_adm_alteracao = ?, 
                     data_entrada = ?, 
-                    data_saida = ?
                 WHERE idequipamentos = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(1, $this->nome_equipamentos);

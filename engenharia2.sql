@@ -28,13 +28,20 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `aluguel` (
-  `idaluguel` int(11) NOT NULL,
+  `idaluguel` int(11) NOT NULL AUTO_INCREMENT,
   `id_usuario_aluguel` int(11) NOT NULL,
   `id_adm_aluguel` int(11) NOT NULL,
   `id_equip_aluguel` int(11) NOT NULL,
-  `obs_aluguel` varchar(45) NOT NULL,
+  `obs_aluguel` varchar(45) DEFAULT NULL,  -- Alterado para permitir NULL
   `aluguel_data_saida` date NOT NULL,
-  `aluguel_data_devolucao` date NOT NULL
+  `aluguel_data_devolucao` date NOT NULL,
+  PRIMARY KEY (`idaluguel`),
+  KEY `fk_usuario_aluguel` (`id_usuario_aluguel`),
+  KEY `fk_adm_aluguel` (`id_adm_aluguel`),
+  KEY `fk_equip_aluguel` (`id_equip_aluguel`),
+  CONSTRAINT `fk_usuario_aluguel` FOREIGN KEY (`id_usuario_aluguel`) REFERENCES `usuario_comum` (`id_usuario`),
+  CONSTRAINT `fk_adm_aluguel` FOREIGN KEY (`id_adm_aluguel`) REFERENCES `usuario_administrador` (`id_administrador`),
+  CONSTRAINT `fk_equip_aluguel` FOREIGN KEY (`id_equip_aluguel`) REFERENCES `equipamentos` (`id_equipamento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -52,7 +59,6 @@ CREATE TABLE `equipamentos` (
   `obs_equipamento` varchar(45) NOT NULL,
   `id_adm_alteracao` int(11) NOT NULL,
   `data_entrada` date NOT NULL,
-  `data_saida` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -84,7 +90,6 @@ CREATE TABLE `usuario_administrador` (
   `contato_administrador` varchar(45) NOT NULL,
   `cargo_administrador` varchar(45) NOT NULL,
   `setor_administrador` varchar(45) NOT NULL,
-  `tipo_usuario_administrador` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -121,7 +126,6 @@ CREATE TABLE `usuario_comum` (
   `data_nasc_usuario` date NOT NULL,
   `setor_usuario` varchar(45) NOT NULL,
   `cargo_usuario` varchar(45) NOT NULL,
-  `status_usuario` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

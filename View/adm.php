@@ -5,7 +5,7 @@ require_once "../Controller/EquipamentoController.php"; // Incluindo o controlad
 session_start();
 
 if ($_SESSION['admin'] == null) {
-    header('Location: login_adm.html'); 
+    header('Location: login_adm.php'); 
     exit();
 }
 
@@ -29,24 +29,33 @@ $equipamentos = $equipamentoController->listar();
 
     <!-- Botões para cadastrar -->
     <button onclick="window.location.href='../View/cadastrar.php'">Cadastrar Equipamentos</button>
-    <button onclick="window.location.href='../Controller/UsuarioController.php?acao=cadastrar'">Cadastrar Usuários</button>
+    <button onclick="window.location.href='../View/cad_usuario.php'">Cadastrar Usuários</button>
 
     <h2>Requisições de Aluguel</h2>
-    <div id="requisicoes">
-        <!-- Aqui você vai listar as requisições de aluguel -->
-        <?php if (!empty($requisicoes)): ?>
-            <ul>
-                <?php foreach ($requisicoes as $requisicao): ?>
-                    <li>
-                        Equipamento: <?= htmlspecialchars($requisicao['equipamento']) ?> | 
-                        Usuário: <?= htmlspecialchars($requisicao['usuario']) ?> | 
-                        Data: <?= htmlspecialchars($requisicao['data']) ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <p>Não há requisições de aluguel no momento.</p>
-        <?php endif; ?>
+<table border="1">
+    <tr>
+        <th>ID Usuário</th>
+        <th>ID Equipamento</th>
+        <th>Observações</th>
+        <th>Data de Saída</th>
+        <th>Data de Devolução</th>
+    </tr>
+    <?php if (!empty($alugueis)): ?>
+    <?php foreach ($alugueis as $aluguel): ?>
+        <tr>
+            <td><?= htmlspecialchars($aluguel['id_usuario_aluguel']) ?></td>
+            <td><?= htmlspecialchars($aluguel['id_equip_aluguel']) ?></td>
+            <td><?= htmlspecialchars($aluguel['obs_aluguel']) ?></td>
+            <td><?= htmlspecialchars($aluguel['aluguel_data_saida']) ?></td>
+            <td><?= htmlspecialchars($aluguel['aluguel_data_devolucao']) ?></td>
+        </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="5">Não há requisições de aluguel no momento.</td>
+    </tr>
+<?php endif; ?>
+
     </div>
 
     <h2>Lista de Equipamentos</h2>

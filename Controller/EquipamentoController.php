@@ -22,7 +22,6 @@ class EquipamentoController {
                 $_POST['obs'],
                 $_POST['id_adm'],
                 $_POST['data_entrada'],
-                $_POST['data_saida']
             );
 
             try {
@@ -66,7 +65,6 @@ class EquipamentoController {
                 $equipamento->setObs($_POST['obs']);
                 $equipamento->setIdAdmAlteracao($_POST['id_adm']);
                 $equipamento->setDataEntrada($_POST['data_entrada']);
-                $equipamento->setDataSaida($_POST['data_saida']);
 
                 try {
                     $equipamento->atualizar($this->db);

@@ -39,8 +39,6 @@ if (!isset($_SESSION['admin'])) {
         <label for="data_entrada">Data de Entrada:</label>
         <input type="date" id="data_entrada" name="data_entrada" required><br>
 
-        <label for="data_saida">Data de Saída:</label>
-        <input type="date" id="data_saida" name="data_saida"><br>
 
         <button type="submit">Cadastrar Equipamento</button>
     </form>
