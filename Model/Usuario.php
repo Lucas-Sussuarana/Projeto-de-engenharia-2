@@ -114,19 +114,22 @@ class Usuario {
     }
 
     // Função para login de usuário
-    public static function login($conn, $email, $senha) {
-        $sql = "SELECT * FROM usuario_comum WHERE email_usuario = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(1, $email);
+    public static function login($db, $email, $senha) {
+        $sql = "SELECT * FROM usuario_comum WHERE email_usuario = :email LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':email', $email);
         $stmt->execute();
+        
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($usuario && password_verify($senha, $usuario['senha_usuario'])) {
-            return $usuario;   
+            return $usuario;
+        } else {
+            echo "Credenciais inválidas.";
+            return false;
         }
-        return false;
     }
-
+    
+    
     // Função para listar equipamentos alugados por este usuário
     public static function listarEquipamentosAlugados($conn, $idUsuario) {
         $sql = "SELECT * FROM aluguel a JOIN equipamentos e ON a.id_equip_aluguel = e.id_equipamento WHERE a.id_usuario_aluguel = ?";

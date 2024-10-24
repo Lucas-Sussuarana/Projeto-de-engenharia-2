@@ -9,36 +9,71 @@ class AluguelController {
         $this->db = Conexao::getConexao();
     }
 
+    // Função para solicitar aluguel
     public function solicitarAluguel() {
         session_start(); // Inicia a sessão se não estiver ativa
 
-        // Verifique se o usuário está logado
+        // Verifica se o usuário está logado
         if (!isset($_SESSION['usuario'])) {
             echo "Usuário não logado.";
             return;
         }
 
-        $id_usuario = $_SESSION['usuario'];
+        // Obtém o ID do usuário logado
+        $id_usuario = $_SESSION['usuario']['id_USUARIO_COMUM'];
 
-        if (!isset($_POST['id_equipamento']) || !isset($_POST['data_devolucao'])) {
+        // Verifica se os campos obrigatórios foram enviados
+        if (!isset($_POST['id_equip_aluguel']) || !isset($_POST['aluguel_data_devolucao'])) {
             echo "Dados incompletos.";
             return;
         }
-        $id_equipamento = $_POST['id_equipamento'];
-        $data_devolucao = $_POST['data_devolucao'];
-        $obs = isset($_POST['obs']) ? $_POST['obs'] : '';
 
-        $aluguel = new Aluguel();
-        $aluguel->setId_usuario($id_usuario);
-        $aluguel->setId_equipamento($id_equipamento);
-        $aluguel->setAluguel_data_saida(date('Y-m-d')); // Data de saída atual
-        $aluguel->setAluguel_data_devolucao($data_devolucao);
-        $aluguel->setObs_aluguel($obs);
+        // Atribui os valores dos campos do formulário
+        $id_equipamento = $_POST['id_equip_aluguel'];
+        $data_devolucao = $_POST['aluguel_data_devolucao'];
+        $obs = isset($_POST['obs_aluguel']) ? $_POST['obs_aluguel'] : '';
 
-        $aluguel->salvarAluguel($this->db);
+        // Cria um novo objeto Aluguel e define os valores
+        $aluguel = new Aluguel(
+            $id_usuario,
+            $id_equipamento,
+            date('Y-m-d'), // Data de saída
+            $data_devolucao,
+            $obs
+        );
 
-        echo "Aluguel solicitado com sucesso!";
+        // Salva a solicitação de aluguel no banco de dados
+        try {
+            $aluguel->salvar($this->db);
+            header("Location: ../View/dashboard_usuario.php"); // Atualize o caminho conforme necessário
+            exit(); //
+        } catch (Exception $e) {
+            echo "Erro ao solicitar aluguel: " . $e->getMessage();
+        }
     }
 
-    
+    // Função para listar solicitações pendentes (sem status definido)
+    public function listarSolicitacoesPendentes() {
+        return Aluguel::listarSolicitacoesPendentes($this->db);
+    }
+
+    // Função para listar equipamentos que já foram emprestados
+    public function listarEquipamentosEmprestados() {
+        return Aluguel::listarEquipamentosEmprestados($this->db);
+    }
+
+    // Função para atualizar o status do aluguel
+    public function atualizarStatus() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id_aluguel = $_POST['id_aluguel'];
+            $status = $_POST['status'];
+
+            try {
+                Aluguel::atualizarStatus($this->db, $id_aluguel, $status);
+                echo "Status atualizado com sucesso!";
+            } catch (Exception $e) {
+                echo "Erro ao atualizar o status: " . $e->getMessage();
+            }
+        }
+    }
 }

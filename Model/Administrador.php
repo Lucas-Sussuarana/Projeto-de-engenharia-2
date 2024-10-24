@@ -133,5 +133,21 @@ class Administrador {
         $stmt = $conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_CLASS, 'Administrador');
     }
+
+    public static function listarSolicitacoesPendentes($conn) {
+        $sql = "SELECT * FROM aluguel WHERE status_aluguel = 'pendente'";
+        $stmt = $conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos os aluguéis pendentes
+    }
+
+    public static function atualizarStatusAluguel($conn, $id_aluguel, $status, $id_adm_aluguel) {
+        $sql = "UPDATE aluguel SET status_aluguel = ?, id_adm_aluguel = ? WHERE id_aluguel = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $status);
+        $stmt->bindParam(2, $id_adm_aluguel);  // ID do administrador que processou a solicitação
+        $stmt->bindParam(3, $id_aluguel);
+        $stmt->execute();
+    }
+    
 }
 ?>

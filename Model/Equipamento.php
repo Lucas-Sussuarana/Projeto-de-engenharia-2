@@ -9,9 +9,9 @@ class Equipamento {
     private $obs_equipamento;
     private $id_adm_alteracao;
     private $data_entrada;
+    private $quantidade; // Adicionando o atributo de quantidade
 
-
-    public function __construct($nome, $tipo, $status, $patrimonio, $obs, $id_adm, $data_entrada,) {
+    public function __construct($nome, $tipo, $status, $patrimonio, $obs, $id_adm, $data_entrada, $quantidade) {
         $this->nome_equipamento = $nome;
         $this->tipo_equipamento = $tipo;
         $this->status_equipamento = $status;
@@ -19,6 +19,7 @@ class Equipamento {
         $this->obs_equipamento = $obs;
         $this->id_adm_alteracao = $id_adm;
         $this->data_entrada = $data_entrada;
+        $this->quantidade = $quantidade; // Inicializando a quantidade
     }
 
     // Métodos GET e SET
@@ -32,7 +33,7 @@ class Equipamento {
     }
 
     public function setNome($nome) {
-        $this->nome_equipamentos = $nome;
+        $this->nome_equipamento = $nome;
     }
 
     public function getTipo() {
@@ -83,9 +84,17 @@ class Equipamento {
         $this->data_entrada = $data_entrada;
     }
 
+    public function getQuantidade() {
+        return $this->quantidade;
+    }
+
+    public function setQuantidade($quantidade) {
+        $this->quantidade = $quantidade;
+    }
+
     // Método para cadastrar equipamento
     public function cadastrar($conn) {
-        $sql = "INSERT INTO equipamentos (nome_equipamento, tipo_equipamento, status_equipamento, patrimonio_equipamento, obs_equipamento, id_adm_alteracao, data_entrada)
+        $sql = "INSERT INTO equipamentos (nome_equipamento, tipo_equipamento, status_equipamento, patrimonio_equipamento, obs_equipamento, id_adm_alteracao, data_entrada, quantidade)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(1, $this->nome_equipamento);
@@ -95,16 +104,16 @@ class Equipamento {
         $stmt->bindParam(5, $this->obs_equipamento);
         $stmt->bindParam(6, $this->id_adm_alteracao);
         $stmt->bindParam(7, $this->data_entrada);
-
+        $stmt->bindParam(8, $this->quantidade); // Adicionando quantidade ao bind
         $stmt->execute();
         $this->id = $conn->lastInsertId();
     }
 
     // Método para listar equipamentos
     public static function listarEquipamentos($conn) {
-        $sql = "SELECT * FROM equipamentos"; // ajuste o nome da tabela conforme necessário
+        $sql = "SELECT * FROM equipamentos"; 
         $stmt = $conn->query($sql);
-        
+
         $equipamentos = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $equipamento = new Equipamento(
@@ -115,14 +124,13 @@ class Equipamento {
                 $row['obs_equipamento'],
                 $row['id_adm_alteracao'],
                 $row['data_entrada'],
-               
+                $row['quantidade'] // Adicionando quantidade ao listar
             );
             $equipamentos[] = $equipamento;
         }
-        
+
         return $equipamentos;
     }
-    
 
     // Método para buscar equipamento por ID
     public static function buscarPorId($conn, $id) {
@@ -136,23 +144,24 @@ class Equipamento {
     // Método para atualizar equipamento
     public function atualizar($conn) {
         $sql = "UPDATE equipamentos SET 
-                    nome_equipamentos = ?, 
+                    nome_equipamento = ?, 
                     tipo_equipamento = ?, 
                     status_equipamento = ?, 
                     patrimonio_equipamento = ?, 
                     obs_equipamento = ?, 
                     id_adm_alteracao = ?, 
                     data_entrada = ?, 
+                    quantidade = ? 
                 WHERE idequipamentos = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(1, $this->nome_equipamentos);
+        $stmt->bindParam(1, $this->nome_equipamento);
         $stmt->bindParam(2, $this->tipo_equipamento);
         $stmt->bindParam(3, $this->status_equipamento);
         $stmt->bindParam(4, $this->patrimonio_equipamento);
         $stmt->bindParam(5, $this->obs_equipamento);
         $stmt->bindParam(6, $this->id_adm_alteracao);
         $stmt->bindParam(7, $this->data_entrada);
-        $stmt->bindParam(8, $this->data_saida);
+        $stmt->bindParam(8, $this->quantidade); // Atualizando quantidade
         $stmt->bindParam(9, $this->id);
         $stmt->execute();
     }

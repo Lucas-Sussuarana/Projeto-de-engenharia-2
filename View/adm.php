@@ -1,20 +1,25 @@
-<!-- views/admin_dashboard.php -->
 <?php
 require_once "../Model/Administrador.php";
-require_once "../Controller/EquipamentoController.php"; // Incluindo o controlador de equipamentos
+require_once "../Controller/EquipamentoController.php";
+require_once "../Controller/AluguelController.php"; // Incluindo o controlador de aluguel
+require_once "../Controller/AdministradorController.php";
 session_start();
 
-if ($_SESSION['admin'] == null) {
+if (!isset($_SESSION['admin'])) {
     header('Location: login_adm.php'); 
     exit();
 }
 
-// Instanciando o controlador de equipamentos
 $equipamentoController = new EquipamentoController();
+$aluguelController = new AluguelController(); // Instanciando o controlador de aluguel
 
 // Listando todos os equipamentos
 $equipamentos = $equipamentoController->listar();
 
+// Listando todas as requisições de aluguel pendentes
+$solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
+
+// Listando todos os equipamentos emprestados
 ?>
 
 <!DOCTYPE html>
@@ -83,7 +88,7 @@ $equipamentos = $equipamentoController->listar();
             <button onclick="window.location.href='../View/cad_usuario.php'">Cadastrar Usuários</button>
         </div>
 
-        <h2>Requisições de Aluguel</h2>
+        <h2>Requisições de Aluguel Pendentes</h2>
         <table>
             <tr>
                 <th>ID Usuário</th>
@@ -91,20 +96,59 @@ $equipamentos = $equipamentoController->listar();
                 <th>Observações</th>
                 <th>Data de Saída</th>
                 <th>Data de Devolução</th>
+                <th>Status</th>
             </tr>
-            <?php if (!empty($alugueis)): ?>
-                <?php foreach ($alugueis as $aluguel): ?>
+            <?php if (!empty($solicitacoesPendentes)): ?>
+                <?php foreach ($solicitacoesPendentes as $solicitacao): ?>
                     <tr>
-                        <td><?= htmlspecialchars($aluguel['id_usuario_aluguel']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['id_equip_aluguel']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['obs_aluguel']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['aluguel_data_saida']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['aluguel_data_devolucao']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['id_usuario_aluguel']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['id_equip_aluguel']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['obs_aluguel']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['aluguel_data_saida']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['aluguel_data_devolucao']) ?></td>
+                        <td>
+                            <form method="post" action="../Controller/rota.php?acao=atualizarStatus">
+                                <input type="hidden" name="idaluguel" value="<?= htmlspecialchars($solicitacao['idaluguel']) ?>">
+                                <select name="status">
+                                    <option value="aprovado">Aprovar</option>
+                                    <option value="recusado">Recusar</option>
+                                </select>
+                                <button type="submit">Atualizar</button>
+                            </form>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5">Não há requisições de aluguel no momento.</td>
+ <td colspan="6">Não há requisições de aluguel no momento.</td>
+                </tr>
+            <?php endif; ?>
+        </table>
+
+        <!-- Tabela de Equipamentos Emprestados -->
+        <h2>Equipamentos Emprestados</h2>
+        <table>
+            <tr>
+                <th>ID Equipamento</th>
+                <th>Nome do Equipamento</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+            <?php if (!empty($equipamentosEmprestados)): ?>
+                <?php foreach ($equipamentosEmprestados as $equipamento): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($equipamento['id_equipamento']) ?></td>
+                        <td><?= htmlspecialchars($equipamento['nome_equipamento']) ?></td>
+                        <td><?= htmlspecialchars($equipamento['quantidade']) ?></td>
+                        <td>
+                            <!-- Botão "Detalhes" que mostra informações adicionais -->
+                            <button onclick="mostrarDetalhes(<?= htmlspecialchars(json_encode($equipamento)) ?>)">Detalhes</button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="4">Não há equipamentos emprestados no momento.</td>
                 </tr>
             <?php endif; ?>
         </table>
@@ -131,6 +175,17 @@ $equipamentos = $equipamentoController->listar();
                 </tr>
             <?php endforeach; ?>
         </table>
+
+        <script>
+            function mostrarDetalhes(equipamento) {
+                alert("Solicitante: " + equipamento.solicitante + "\n" +
+                      "Tipo de Equipamento: " + equipamento.tipo_equipamento + "\n" +
+                      "Quantidade: " + equipamento.quantidade);
+            }
+        </script>
+
     </div>
 </body>
 </html>
+
+Se precisar de mais ajuda ou detalhes, fique à vontade para perguntar!

@@ -57,5 +57,64 @@ class AdministradorController {
             }
         }
     }
+
+    public function listarSolicitacoesPendentes() {
+        session_start(); // Inicia a sessão se não estiver ativa
+    
+        // Verifique se o administrador está logado
+        if (!isset($_SESSION['admin'])) {
+            echo "Administrador não logado.";
+            return;
+        }
+    
+        // Pega as solicitações pendentes de aluguel
+        $solicitacoesPendentes = Aluguel::listarSolicitacoesPendentes($this->db);
+        
+        // Exibe as solicitações (Ajustar para uma view HTML conforme necessário)
+        foreach ($solicitacoesPendentes as $solicitacao) {
+            echo "Equipamento: " . htmlspecialchars($solicitacao['id_equipamento']) . "<br>";
+            echo "Usuário: " . htmlspecialchars($solicitacao['id_usuario_aluguel']) . "<br>";
+            echo "Data de Saída: " . htmlspecialchars($solicitacao['aluguel_data_saida']) . "<br>";
+            echo "Data de Devolução: " . htmlspecialchars($solicitacao['aluguel_data_devolucao']) . "<br>";
+            echo "<form method='post' action='rota_admin.php?acao=atualizarStatus'>";
+            echo "<input type='hidden' name='id_aluguel' value='" . htmlspecialchars($solicitacao['id_aluguel']) . "'>";
+            echo "<select name='status'>";
+            echo "<option value='aprovado'>Aprovar</option>";
+            echo "<option value='recusado'>Recusar</option>";
+            echo "</select>";
+            echo "<button type='submit'>Enviar</button>";
+            echo "</form><br>";
+        }
+    }
+    
+    public function atualizarStatusAluguel() {
+        session_start(); // Inicia a sessão se não estiver ativa
+    
+        // Verifique se o administrador está logado
+        if (!isset($_SESSION['admin'])) {
+            echo "Administrador não logado.";
+            return;
+        }
+    
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id_aluguel = $_POST['idaluguel']; // Corrigido
+            $status = $_POST['status'];
+            $id_adm_aluguel = $_SESSION['admin']['id_administrador'];
+    
+            try {
+                // Atualiza o status do aluguel no banco de dados
+                Aluguel::atualizarStatus($this->db, $id_aluguel, $status, $id_adm_aluguel);
+                // Limpa o buffer de saída antes de redirecionar
+                ob_start();
+                header('Location: ../View/adm.php');
+                ob_end_flush();
+                exit();
+            } catch (Exception $e) {
+                echo "Erro ao atualizar o status: " . $e->getMessage();
+            }
+        }
+    }
+    
+    
 }
 ?>
