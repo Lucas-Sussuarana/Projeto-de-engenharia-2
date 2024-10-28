@@ -1,3 +1,4 @@
+<!-- views/cadastrar_equipamento.php -->
 <?php
 session_start();
 
@@ -41,7 +42,6 @@ if (!isset($_SESSION['admin'])) {
         }
         input[type="text"],
         input[type="date"],
-        input[type="number"],
         textarea {
             width: calc(100% - 24px); /* Largura total menos o padding */
             padding: 12px; /* Preenchimento interno */
@@ -51,8 +51,7 @@ if (!isset($_SESSION['admin'])) {
             transition: border-color 0.3s;
         }
         input[type="text"]:focus,
-        input[type="date"]:focus,
-        input[type="number"]:focus {
+        input[type="date"]:focus {
             border-color: #007BFF;
             outline: none;
         }
@@ -85,7 +84,7 @@ if (!isset($_SESSION['admin'])) {
 </head>
 <body>
     <h1>Cadastrar Equipamento</h1>
-    <form action="../Controller/rota.php?acao=salvarEquipamento" method="POST">
+    <form action="../Controller/rota.php?acao=cadEquipamento" method="POST">
         <label for="nome">Nome do Equipamento:</label>
         <input type="text" id="nome" name="nome" required>
 
@@ -106,9 +105,6 @@ if (!isset($_SESSION['admin'])) {
 
         <label for="data_entrada">Data de Entrada:</label>
         <input type="date" id="data_entrada" name="data_entrada" required>
-
-        <label for="quantidade">Quantidade:</label>
-        <input type="number" name="quantidade" id="quantidade" required min="1">
 
         <button type="submit">Cadastrar Equipamento</button>
     </form>

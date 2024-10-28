@@ -9,7 +9,6 @@ class AluguelController {
         $this->db = Conexao::getConexao();
     }
 
-    // Função para solicitar aluguel
     public function solicitarAluguel() {
         session_start(); // Inicia a sessão se não estiver ativa
 
@@ -51,18 +50,9 @@ class AluguelController {
             echo "Erro ao solicitar aluguel: " . $e->getMessage();
         }
     }
-
-    // Função para listar solicitações pendentes (sem status definido)
     public function listarSolicitacoesPendentes() {
         return Aluguel::listarSolicitacoesPendentes($this->db);
     }
-
-    // Função para listar equipamentos que já foram emprestados
-    public function listarEquipamentosEmprestados() {
-        return Aluguel::listarEquipamentosEmprestados($this->db);
-    }
-
-    // Função para atualizar o status do aluguel
     public function atualizarStatus() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_aluguel = $_POST['id_aluguel'];
@@ -76,4 +66,5 @@ class AluguelController {
             }
         }
     }
+    
 }

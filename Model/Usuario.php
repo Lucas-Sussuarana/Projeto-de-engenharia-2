@@ -114,22 +114,19 @@ class Usuario {
     }
 
     // Função para login de usuário
-    public static function login($db, $email, $senha) {
-        $sql = "SELECT * FROM usuario_comum WHERE email_usuario = :email LIMIT 1";
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam(':email', $email);
+    public static function login($conn, $email, $senha) {
+        $sql = "SELECT * FROM usuario_comum WHERE email_usuario = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $email);
         $stmt->execute();
-        
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if ($usuario && password_verify($senha, $usuario['senha_usuario'])) {
-            return $usuario;
-        } else {
-            echo "Credenciais inválidas.";
-            return false;
+            return $usuario;   
         }
+        return false;
     }
-    
-    
+
     // Função para listar equipamentos alugados por este usuário
     public static function listarEquipamentosAlugados($conn, $idUsuario) {
         $sql = "SELECT * FROM aluguel a JOIN equipamentos e ON a.id_equip_aluguel = e.id_equipamento WHERE a.id_usuario_aluguel = ?";
@@ -157,6 +154,31 @@ class Usuario {
         $sql = "SELECT * FROM aluguel";
         $stmt = $conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public static function excluir($conn, $id) {
+        $sql = "DELETE FROM usuario_comum WHERE id_USUARIO_COMUM = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    public static function listar($conn) {
+        $sql = "SELECT * FROM usuario_comum";
+        $stmt = $conn->query($sql);
+        $usuarios = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $usuarios[] = new Usuario(
+                $row['nome_usuario'],
+                $row['email_usuario'],
+                $row['cpf_usuario'],
+                $row['contato_usuario'],
+                $row['senha_usuario'], // Você pode querer omitir a senha aqui
+                $row['data_nasc_usuario'],
+                $row['setor_usuario'],
+                $row['cargo_usuario']
+            );
+            $usuarios[count($usuarios) - 1]->id = $row['id_USUARIO_COMUM']; // Atribuir o ID ao objeto
+        }
+        return $usuarios;
     }
 }
 

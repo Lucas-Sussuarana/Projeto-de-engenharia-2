@@ -128,7 +128,7 @@
             </div>
             <div class="form-group">
                 <label for="email_usuario">Email:</label>
-                <input type="email" name="email_usuario" id ="email_usuario" placeholder="Digite o e-mail" required>
+                <input type="email" name="email_usuario" id="email_usuario" placeholder="Digite o e-mail" required>
             </div>
             <div class="form-group">
                 <label for="cpf_usuario">CPF:</label>

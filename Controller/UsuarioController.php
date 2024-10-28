@@ -8,7 +8,7 @@ class UsuarioController {
     private $db;
 
     public function __construct() {
-        $this->db = Conexao::getConexao(); // Ajuste conforme sua configuração de conexão
+        $this->db = Conexao::getConexao();
     }
 
     // Função para cadastrar um novo usuário
@@ -24,12 +24,9 @@ class UsuarioController {
                 $_POST['setor_usuario'],
                 $_POST['cargo_usuario']
             );
-            
-            try {
-                // Salvar usuário no banco de dados
-                $usuario->cadastrar($this->db);
 
-                // Redireciona para a tela de login
+            try {
+                $usuario->cadastrar($this->db);
                 header('Location: ../View/login_usuario.php');
                 exit();
             } catch (Exception $e) {
@@ -38,27 +35,17 @@ class UsuarioController {
         }
     }
 
-    // Função para login
+    // Método para login
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email_usuario'];
             $senha = $_POST['senha_usuario'];
-    
-            // Chama o método login da classe Usuario
+
             $usuario = Usuario::login($this->db, $email, $senha);
-    
+
             if ($usuario) {
-                // Iniciar a sessão e armazenar os dados do usuário logado
                 session_start();
-                
-                // Armazenando os dados do usuário na sessão
-                $_SESSION['usuario'] = [
-                    'id_USUARIO_COMUM' => $usuario['id_USUARIO_COMUM'],
-                    'nome_usuario' => $usuario['nome_usuario'],
-                    'email_usuario' => $usuario['email_usuario'],
-                ];
-    
-                // Redireciona para o dashboard do usuário
+                $_SESSION['usuario'] = $usuario;
                 header('Location: ../View/dashboard_usuario.php');
                 exit();
             } else {
@@ -66,19 +53,18 @@ class UsuarioController {
             }
         }
     }
-    
-    
-    public function listarAlugueisUsuario() {
-        
-        // Obtém o ID do usuário logado
-        $id_usuario = $_SESSION['usuario']['id_USUARIO_COMUM'];
 
-        // Busca os aluguéis do usuário
-        $alugueis = Aluguel::listarAlugueisPorUsuario($this->db, $id_usuario);
-
-        return $alugueis;
+    // Função para listar os equipamentos alugados pelo usuário
+    public function listarEquipamentosAlugados() {
+        session_start();
+        if (isset($_SESSION['usuario'])) {
+            $idUsuario = $_SESSION['usuario']['id_usuario'];
+            return Usuario::listarEquipamentosAlugados($this->db, $idUsuario);
+        }
+        return [];
     }
 
+    // Método para solicitar aluguel de equipamentos
     public function solicitarAluguel() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_usuario = $_POST['id_USUARIO_COMUM'];
@@ -103,7 +89,44 @@ class UsuarioController {
             }
         }
     }
-    
+
+    // Método para excluir um usuário com mensagens de depuração
+    public function excluir($id) {
+        try {
+            if (empty($id)) {
+                echo "ID do usuário está vazio.";
+                return;
+            }
+
+            echo "Tentando excluir o usuário com ID: " . htmlspecialchars($id) . "<br>";
+
+            $resultado = Usuario::excluir($this->db, $id);
+
+            if ($resultado) {
+                echo "Usuário excluído com sucesso.<br>";
+            } else {
+                echo "Falha ao excluir o usuário. Verifique se o ID existe.<br>";
+            }
+        } catch (Exception $e) {
+            echo "Erro ao excluir usuário: " . $e->getMessage();
+        }
+    }
+
+    // Método para listar todos os usuários
+    public function listar() {
+        return Usuario::listar($this->db);
+    }
+    public function listarAlugueisUsuario() {
+        
+        // Obtém o ID do usuário logado
+        $id_usuario = $_SESSION['usuario']['id_USUARIO_COMUM'];
+
+        // Busca os aluguéis do usuário
+        $alugueis = Aluguel::listarAlugueisPorUsuario($this->db, $id_usuario);
+
+        return $alugueis;
+    }
 }
+
 
 ?>

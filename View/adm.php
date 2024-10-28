@@ -86,6 +86,7 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
         <div>
             <button onclick="window.location.href='../View/cadastrar.php'">Cadastrar Equipamentos</button>
             <button onclick="window.location.href='../View/cad_usuario.php'">Cadastrar Usuários</button>
+            <button onclick="window.location.href='excluir_usuarios.php'">Excluir Usuários</button>
         </div>
 
         <h2>Requisições de Aluguel Pendentes</h2>

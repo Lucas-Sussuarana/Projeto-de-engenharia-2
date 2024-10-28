@@ -57,7 +57,6 @@ class AdministradorController {
             }
         }
     }
-
     public function listarSolicitacoesPendentes() {
         session_start(); // Inicia a sessão se não estiver ativa
     
@@ -114,7 +113,5 @@ class AdministradorController {
             }
         }
     }
-    
-    
 }
 ?>
