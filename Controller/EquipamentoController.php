@@ -22,6 +22,7 @@ class EquipamentoController {
                 $_POST['obs'],
                 $_POST['id_adm'],
                 $_POST['data_entrada'],
+                $_POST['quantidade'] // Adicionando o campo quantidade
             );
 
             try {
