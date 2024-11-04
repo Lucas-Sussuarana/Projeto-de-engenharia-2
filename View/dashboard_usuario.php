@@ -101,6 +101,9 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
             background-color: #FF0000;
             color: white;
         }
+        .clear-button:hover {
+            background-color: #CC0000;
+        }
 
         /* Estilos para tabela */
         table {
@@ -169,41 +172,51 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
 <body>
     <div class="container">
         <h1>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario']['nome_usuario']) ?>!</h1>
-
+        <div style="text-align: right; margin-bottom: 20px;">
+            <form action='../Controller/rota.php?acao=logout_usuario' method="post" style="display: inline;">
+                <button type="submit" style="background-color: #dc3545; color: white; padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Sair</button>
+            </form>
+        </div>
         <?php if ($msg): ?>
             <p class="msg-success"><?= htmlspecialchars($msg) ?></p>
         <?php endif; ?>
 
         <h2>Solicitar Aluguel de Equipamento</h2>
-        
-        <form action="../Controller/rota.php?acao=solicitarAluguel" method="post">
-            <input type="hidden" name="id_usuario_aluguel" value="<?= $_SESSION['usuario']['id_USUARIO_COMUM'] ?>">
-            
-            <label for="equipamento">Selecione o Equipamento:</label>
-            <select name="id_equip_aluguel" id="equipamento" required>
-                <option value="">Selecione um equipamento</option>
-                <?php foreach ($equipamentos as $equipamento): ?>
-                    <option value="<?= htmlspecialchars($equipamento->getId()) ?>">
-                        <?= htmlspecialchars($equipamento->getNome()) ?> - <?= htmlspecialchars($equipamento->getTipo()) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            
-            <label for="quantidade">Quantidade:</label>
-            <input type="number" name="quantidade" id="quantidade" min="1" placeholder="Informe a quantidade desejada" required>
-            
-            <label for="obs_aluguel">Observações:</label>
-            <input type="text" name="obs_aluguel" id="obs_aluguel" placeholder="Especifique o motivo do aluguel" required>
-            
-            <label for="data_saida">Data de Saída:</label>
-            <input type="date" name="aluguel_data_saida" id="data_saida" required>
-            
-            <label for="data_devolucao">Data de Devolução:</label>
-            <input type="date" name="aluguel_data_devolucao" id="data_devolucao" required>
-            
-            <button type="submit" onclick="confirmarDevolucao(this.form)">Solicitar Aluguel</button>
-            <button id="clear-form" class="clear-button">Limpar Campos</button>
-        </form>
+
+<form id="aluguelForm" action="../Controller/rota.php?acao=solicitarAluguel" method="post">
+    <input type="hidden" name="id_usuario_aluguel" value="<?= $_SESSION['usuario']['id_USUARIO_COMUM'] ?>">
+
+    <label for="equipamento">Selecione o Equipamento:</label>
+    <select name="id_equip_aluguel" id="equipamento" required>
+        <option value="">Selecione um equipamento</option>
+        <?php foreach ($equipamentos as $equipamento): ?>
+            <option value="<?= htmlspecialchars($equipamento->getId()) ?>">
+                <?= htmlspecialchars($equipamento->getNome()) ?> - <?= htmlspecialchars($equipamento->getTipo()) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+
+    <label for="quantidade">Quantidade:</label>
+    <input type="number" name="quantidade" id="quantidade" min="1" placeholder="Informe a quantidade desejada" required pattern="\d+" inputmode="numeric">
+
+    <label for="obs_aluguel">Observações:</label>
+    <input type="text" name="obs_aluguel" id="obs_aluguel" placeholder="Especifique o motivo do aluguel" required>
+
+    <label for="data_saida">Data de Saída:</label>
+    <input type="date" name="aluguel_data_saida" id="data_saida" required>
+
+    <label for="data_devolucao">Data de Devolução:</label>
+    <input type="date" name="aluguel_data_devolucao" id="data_devolucao" required>
+
+    <button type="submit" onclick="confirmarDevolucao(this.form)">Solicitar Aluguel</button>
+    <button type="button" id="clear-form" class="clear-button" onclick="limparCampos()">Limpar Campos</button>
+</form>
+
+<script>
+    function limparCampos() {
+        document.getElementById("aluguelForm").reset();
+    }
+</script>
 
         <h2>Seus Equipamentos Alugados</h2>
         

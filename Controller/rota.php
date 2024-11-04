@@ -39,37 +39,20 @@ switch ($acao) {
 
     case "aprovarSolicitacao":
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id_aluguel = $_POST['idaluguel'];
-            $quantidade_solicitada = $_POST['quantidade_solicitada'];
-            $status = 'aprovado'; // Defina o status como aprovado
-            
-            $id_adm_aluguel = $_SESSION['admin']['id_usuario_administrador'];
-    
-            if (isset($id_adm_aluguel)) {
+            $id_aluguel = $_POST['idaluguel'] ?? null;
+            $quantidade_solicitada = $_POST['quantidade_solicitada'] ?? 0;
+            $status = 'aprovado';
+            $id_adm_aluguel = $_SESSION['admin']['id_usuario_administrador'] ?? null;
+
+            if ($id_adm_aluguel && $id_aluguel) {
                 // Chama o método atualizarStatus do AluguelController
                 $aluguelController->atualizarStatusAluguel($id_aluguel, $status, $id_adm_aluguel, $quantidade_solicitada);
             } else {
-                echo "Erro: Administrador não logado.";
+                echo "Erro: Administrador não logado ou ID de aluguel não encontrado.";
             }
         }
         break;
 
-    case "atualizarStatus":
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id_aluguel = $_POST['idaluguel'];
-            $status = $_POST['status'];
-            $quantidade_solicitada = $_POST['quantidade_solicitada'];
-            
-            $id_adm_aluguel = $_SESSION['admin']['id_usuario_administrador'];
-    
-            if (isset($id_adm_aluguel)) {
-                // Chama o método atualizarStatus do AluguelController, que internamente chama reduzirQuantidade
-                $aluguelController->atualizarStatusAluguel($id_aluguel, $status, $id_adm_aluguel, $quantidade_solicitada);
-            } else {
-                echo "Erro: Administrador não logado.";
-            }
-        }
-        break;
 
     // Rotas para Equipamentos
     case "cadEquipamento":
@@ -109,22 +92,68 @@ switch ($acao) {
     case "listarAlugados":
         $equipamentosAlugados = $aluguelController->listarAlugados($_SESSION['usuario']['idusuario']);
         break;
-    
-    case "devolverEquipamento":
-            // Verifica se a ação solicitada é devolverEquipamento
-        if ($_GET['acao'] == 'devolverEquipamento') {
-            $idEquipamento = $_POST['idequipamento'];
-            $quantidadeSolicitada = $_POST['quantidade_solicitada'];
 
-            // Chamando o método para devolução
-            $aluguelController->devolverEquipamento($idEquipamento, $quantidadeSolicitada);
-            
-            // Redireciona de volta ao painel do administrador
-            header('Location: ../View/adm.php');
-            exit();
-        }
-        break;
+        case "devolverEquipamento":
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $idAluguel = $_POST['idaluguel'] ?? null; // Corrigido para 'idaluguel'
+                $idEquipamento = $_POST['id_equip_aluguel'] ?? null;
+                $quantidadeDevolvida = $_POST['quantidade_devolvida'] ?? 0;
         
+                if ($idAluguel && $idEquipamento) {
+                    // Chamando o método de devolução no AluguelController
+                    $aluguelController->devolverEquipamento($idAluguel, $idEquipamento, $quantidadeDevolvida);
+                } else {
+                    echo "Erro: ID de aluguel ou ID de equipamento não encontrado.";
+                }
+            }
+            break;
+        
+            case "logout":
+                // Destrói todas as variáveis de sessão
+                $_SESSION = array();
+        
+                // Se for necessário destruir a sessão completamente
+                if (ini_get("session.use_cookies")) {
+                    $params = session_get_cookie_params();
+                    setcookie(session_name(), '', time() - 42000,
+                        $params["path"], $params["domain"],
+                        $params["secure"], $params["httponly"]
+                    );
+                }
+                session_destroy();
+        
+                // Redireciona para a página de login
+                header('Location: ../View/login_adm.php?mensagem=Logout realizado com sucesso!');
+                exit();
+                break;
+
+                case "logout_usuario":
+                    // Destrói todas as variáveis de sessão
+                    $_SESSION = array();
+            
+                    // Se for necessário destruir a sessão completamente
+                    if (ini_get("session.use_cookies")) {
+                        $params = session_get_cookie_params();
+                        setcookie(session_name(), '', time() - 42000,
+                            $params["path"], $params["domain"],
+                            $params["secure"], $params["httponly"]
+                        );
+                    }
+                    session_destroy();
+            
+                    // Redireciona para a página de login
+                    header('Location: ../View/login_usuario.php?mensagem=Logout realizado com sucesso!');
+                    exit();
+                    break;
+
+                case "removerEquipamento":
+                     $id = $_GET['id'] ?? null;
+                      if ($id) {
+                         $equipamentoController->remover($id);
+                      } else {
+                         echo "Erro: ID do equipamento não encontrado.";
+                      }
+                     break;
 
     default:
         echo "Ação não reconhecida.";

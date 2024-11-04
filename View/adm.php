@@ -90,6 +90,7 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
             <button onclick="window.location.href='../View/cadastrar.php'">Cadastrar Equipamentos</button>
             <button onclick="window.location.href='../View/cad_usuario.php'">Cadastrar Usuários</button>
             <button onclick="window.location.href='excluir_usuarios.php'">Excluir Usuários</button>
+            <button onclick="window.location.href='../Controller/rota.php?acao=logout'">Sair</button>
         </div>
 
         <h2>Requisições de Aluguel Pendentes</h2>
@@ -133,8 +134,7 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
         </table>
 
         <!-- Tabela de Equipamentos Emprestados -->
-        <h2>Equipamentos Emprestados</h2>
-<table>
+        <table>
     <tr>
         <th>ID Equipamento</th>
         <th>Nome do Equipamento</th>
@@ -148,7 +148,7 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
             <tr>
                 <td><?= htmlspecialchars($equipamento['idequipamento']) ?></td>
                 <td><?= htmlspecialchars($equipamento['nome_equipamento']) ?></td>
-                <td><?= htmlspecialchars($solicitacao['nome_usuario']) ?></td> 
+                <td><?= htmlspecialchars($equipamento['nome_usuario']) ?></td> 
                 <td><?= htmlspecialchars($equipamento['quantidade']) ?></td>
                 <td><?= htmlspecialchars($equipamento['aluguel_data_saida']) ?></td> 
                 <td>
@@ -156,17 +156,19 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
                     <button onclick="mostrarDetalhes(<?= htmlspecialchars(json_encode($equipamento)) ?>)">Detalhes</button>
                     
                     <!-- Botão "Devolvido" com confirmação -->
-                    <form method="post" action="../Controller/rota.php?acao=devolverEquipamento" style="display:inline;">
-                        <input type="hidden" name="idequipamento" value="<?= htmlspecialchars($equipamento['idequipamento']) ?>">
-                        <input type="hidden" name="quantidade_devolvida" value="<?= htmlspecialchars($equipamento['quantidade']) ?>"> <!-- Mudando para quantidade_devolvida -->
-                        <button type="button" onclick="confirmarDevolucao(this.form)">Devolvido</button>
+                    <form method="post" action="../Controller/rota.php?acao=devolverEquipamento">
+                        <input type="hidden" name="idaluguel" value="<?= htmlspecialchars($equipamento['idaluguel']) ?>">
+                        <input type="hidden" name="id_equip_aluguel" value="<?= htmlspecialchars($equipamento['idequipamento']) ?>">
+                        <input type="hidden" name="quantidade_devolvida" value="<?= htmlspecialchars($equipamento['quantidade']) ?>">
+                        <button type="submit">Devolvido</button>
                     </form>
+
                 </td>
             </tr>
         <?php endforeach; ?>
     <?php else: ?>
         <tr>
-            <td colspan="6">Não há equipamentos emprestados no momento.</td> <!-- Ajustando o colspan -->
+            <td colspan="4">Não há equipamentos emprestados no momento.</td>
         </tr>
     <?php endif; ?>
 </table>
@@ -191,7 +193,7 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
                     <td><?= htmlspecialchars($equipamento->getStatus()) ?></td>
                     <td>
                         <button onclick="window.location.href='../Controller/EquipamentoController.php?acao=atualizar&id=<?= $equipamento->getId() ?>'">Atualizar</button>
-                        <button onclick="if(confirm('Tem certeza que deseja remover este equipamento?')) { window.location.href='../Controller/EquipamentoController.php?acao=remover&id=<?= $equipamento->getId() ?>' }">Remover</button>
+                        <button onclick="if(confirm('Tem certeza que deseja remover este equipamento?')) { window.location.href='../Controller/rota.php?acao=removerEquipamento&id=<?= $equipamento->getId() ?>' }">Remover</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -202,12 +204,6 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
                 alert("ID Equipamento: " + equipamento.idequipamento + "\n" +
                       "Nome: " + equipamento.nome_equipamento + "\n" +
                       "Quantidade: " + equipamento.quantidade);
-            }
-
-            function confirmarDevolucao(form) {
-                if (confirm("Tem certeza de que deseja confirmar a devolução deste equipamento?")) {
-                    form.submit();
-                }
             }
         </script>
 

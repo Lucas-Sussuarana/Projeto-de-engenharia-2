@@ -6,7 +6,8 @@ if (!isset($_SESSION['admin'])) {
     exit();
 }
 
-$id_adm = $_SESSION['admin']['id']; // Altere conforme sua estrutura de sessão
+// Captura o ID do administrador da sessão
+$id_adm = $_SESSION['admin']['id_usuario_administrador']; // Altere conforme sua estrutura de sessão
 ?>
 
 <!DOCTYPE html>
@@ -80,11 +81,16 @@ $id_adm = $_SESSION['admin']['id']; // Altere conforme sua estrutura de sessão
             background-color: #0056b3;
             transform: translateY(-2px);
         }
-        .button-red {
-            background-color: #e91e63;
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
         }
-        .button-red:hover {
-            background-color: #c2185b;
+        .back-button:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -109,7 +115,7 @@ $id_adm = $_SESSION['admin']['id']; // Altere conforme sua estrutura de sessão
         </select>
 
         <label for="patrimonio">Número de Patrimônio:</label>
-        <input type="text" id="patrimonio" name="patrimonio" required pattern="\d*" title="Apenas números são permitidos">
+        <input type="text" id="patrimonio" name="patrimonio" required>
 
         <label for="obs">Observações:</label>
         <textarea id="obs" name="obs" rows="4"></textarea>
@@ -118,13 +124,14 @@ $id_adm = $_SESSION['admin']['id']; // Altere conforme sua estrutura de sessão
         <input type="text" id="id_adm" name="id_adm" value="<?php echo $id_adm; ?>" readonly required>
 
         <label for="data_entrada">Data de Entrada:</label>
-        <input type="date" id="data_entrada" name="data_entrada" required max="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>">
+        <input type="date" id="data_entrada" name="data_entrada" required>
 
         <label for="quantidade">Quantidade:</label>
         <input type="number" name="quantidade" id="quantidade" required min="1">
 
         <button type="submit">Cadastrar Equipamento</button>
-        <button type="button" onclick="window.location.href='adm.php';" class="button-red">Retornar</button>
     </form>
+
+    <a class="back-button" href="adm.php">Voltar para o Painel do Administrador</a>
 </body>
 </html>

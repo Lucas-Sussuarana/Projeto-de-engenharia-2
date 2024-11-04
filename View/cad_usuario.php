@@ -29,7 +29,7 @@
             width: 100%;
             max-width: 500px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 20px; /* Para evitar o corte na parte superior */
         }
         .cadastro-container h1 {
             margin-bottom: 25px;
@@ -61,25 +61,6 @@
         .form-group button {
             width: 100%;
             padding: 12px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .form-group button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-        .form-group button:active {
-            transform: translateY(0);
-        }
-        .button.cancel button {
-            width: 100%;
-            padding: 12px;
             background-color: #e91e63;
             color: white;
             border: none;
@@ -89,11 +70,11 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .button.cancel button:hover {
+        .form-group button:hover {
             background-color: #c2185b;
             transform: translateY(-2px);
         }
-        .button.cancel button:active {
+        .form-group button:active {
             transform: translateY(0);
         }
 
@@ -132,23 +113,15 @@
             }
             .form-group button {
                 padding: 8px;
-                font-size : 0.85rem;
+                font-size: 0.85rem;
             }
-        }
-
-        /* Mensagem de confirmação */
-        .confirmacao {
-            display: none;
-            color: green;
-            font-weight: bold;
-            margin-top: 15px;
         }
     </style>
 </head>
 <body>
     <div class="cadastro-container">
         <h1>Cadastro de Usuário</h1>
-        <form id="formCadastro" action="../Controller/rota.php?acao=cadastrarUsuario" method="POST">
+        <form action="../Controller/rota.php?acao=cadastrarUsuario" method="POST">
             <div class="form-group">
                 <label for="nome_usuario">Nome:</label>
                 <input type="text" name="nome_usuario" id="nome_usuario" placeholder="Digite o nome completo" required>
@@ -163,7 +136,7 @@
             </div>
             <div class="form-group">
                 <label for="contato_usuario">Contato:</label>
-                <input type="text" name="contato_usuario" id="contato_usuario" placeholder="(00) 0 0000-0000" required>
+                <input type="text" name="contato_usuario" id="contato_usuario" placeholder="Telefone ou celular" required>
             </div>
             <div class="form-group">
                 <label for="senha_usuario">Senha:</label>
@@ -184,81 +157,7 @@
             <div class="form-group">
                 <button type="submit">Cadastrar</button>
             </div>
-            <div class="button cancel">
-                <button id="voltarButton" onclick="history.back()">Voltar</button>
-</form>
+        </form>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('formCadastro');
-            const nomeInput = document.getElementById('nome_usuario');
-            const cpfInput = document.getElementById('cpf_usuario');
-            const telefoneInput = document.getElementById('contato_usuario');
-            const dataNascimentoInput = document.getElementById('data_nasc_usuario');
-            const confirmacaoLabel = document.getElementById('confirmacao');
-
-            // Validação do campo "Nome" (sem números)
-            nomeInput.addEventListener('input', function() {
-                nomeInput.value = nomeInput.value.replace(/[0-9]/g, '');
-            });
-
-            // Validação e formatação do CPF
-            cpfInput.addEventListener('input', function() {
-                let value = cpfInput.value.replace(/\D/g, '');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2')
-                             .replace(/(\d{3})(\d)/, '$1.$2')
-                             .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                cpfInput.value = value;
-            });
-
-            // Validação do campo "Contato" (apenas números no formato (00) 0 0000-0000)
-            telefoneInput.addEventListener('input', function() {
-                let value = telefoneInput.value.replace(/\D/g, '');
-
-                // Limitar a entrada a 11 dígitos (DDD + 9 dígitos do telefone)
-                if (value.length > 11) {
-                    value = value.substring(0, 11);
-                }
-
-                // Formatação do número
-                if (value.length > 2) {
-                    value = value.replace(/^(\d{2})(\d)/, '($1) $2');
-                }
-                if (value.length > 7) {
-                    value = value.replace(/^(\(\d{2}\) \d)(\d{4})(\d{4})$/, '$1 $2-$3');
-                }
-
-                telefoneInput.value = value;
-
-                // Aviso se o campo não estiver preenchido corretamente
-                const aviso = document.getElementById('aviso'); // Supondo que você tenha um elemento com id "aviso"
-                if (value.length < 10) { // DDD + 9 dígitos do telefone
-                    aviso.textContent = 'Por favor, preencha o número de telefone corretamente.';
-                } else {
-                    aviso.textContent = ''; // Limpa o aviso se o telefone estiver correto
-                }
-            });
-
-            // Validação da data de nascimento (18 anos e não futuro)
-            dataNascimentoInput.addEventListener('input', function() {
-                const today = new Date();
-                const birthDate = new Date(dataNascimentoInput.value);
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const month = today.getMonth() - birthDate.getMonth();
-
-                if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-
-                if (age < 18 || birthDate > today) {
-                    alert('Data de nascimento inválida. O usuário deve ter pelo menos 18 anos e a data não pode estar no futuro.');
-                    dataNascimentoInput.value = '';
-                }
-            });
-
-        });
-    </script>
 </body>
 </html>
-
