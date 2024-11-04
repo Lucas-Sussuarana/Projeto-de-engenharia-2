@@ -95,8 +95,8 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
         <h2>Requisições de Aluguel Pendentes</h2>
         <table>
             <tr>
-                <th>ID Usuário</th>
-                <th>ID Equipamento</th>
+                <th>Nome do Solicitante</th>
+                <th>Equipamento Solicitado</th>
                 <th>Observações</th>
                 <th>Data de Saída</th>
                 <th>Data de Devolução</th>
@@ -106,8 +106,8 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
             <?php if (!empty($solicitacoesPendentes)): ?>
                 <?php foreach ($solicitacoesPendentes as $solicitacao): ?>
                     <tr>
-                        <td><?= htmlspecialchars($solicitacao['id_usuario_aluguel']) ?></td>
-                        <td><?= htmlspecialchars($solicitacao['id_equip_aluguel']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['nome_usuario']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['nome_equipamento']) ?></td>
                         <td><?= htmlspecialchars($solicitacao['obs_aluguel']) ?></td>
                         <td><?= htmlspecialchars($solicitacao['aluguel_data_saida']) ?></td>
                         <td><?= htmlspecialchars($solicitacao['aluguel_data_devolucao']) ?></td>
@@ -119,7 +119,6 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
                                 <select name="status">
                                     <option value="aprovado">Aprovar</option>
                                     <option value="recusado">Recusar</option>
-                                    <option value="entregue">Entregue</option> <!-- Opção para marcar como entregue -->
                                 </select>
                                 <button type="submit">Atualizar</button>
                             </form>
@@ -135,40 +134,43 @@ $equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
 
         <!-- Tabela de Equipamentos Emprestados -->
         <h2>Equipamentos Emprestados</h2>
-        <table>
+<table>
+    <tr>
+        <th>ID Equipamento</th>
+        <th>Nome do Equipamento</th>
+        <th>Nome do Usuário</th> 
+        <th>Quantidade Solicitada</th>
+        <th>Data da Solicitação</th> 
+        <th>Ações</th>
+    </tr>
+    <?php if (!empty($equipamentosEmprestados)): ?>
+        <?php foreach ($equipamentosEmprestados as $equipamento): ?>
             <tr>
-                <th>ID Equipamento</th>
-                <th>Nome do Equipamento</th>
-                <th>Quantidade Solicitada</th>
-                <th>Ações</th>
+                <td><?= htmlspecialchars($equipamento['idequipamento']) ?></td>
+                <td><?= htmlspecialchars($equipamento['nome_equipamento']) ?></td>
+                <td><?= htmlspecialchars($solicitacao['nome_usuario']) ?></td> 
+                <td><?= htmlspecialchars($equipamento['quantidade']) ?></td>
+                <td><?= htmlspecialchars($equipamento['aluguel_data_saida']) ?></td> 
+                <td>
+                    <!-- Botão "Detalhes" que mostra informações adicionais -->
+                    <button onclick="mostrarDetalhes(<?= htmlspecialchars(json_encode($equipamento)) ?>)">Detalhes</button>
+                    
+                    <!-- Botão "Devolvido" com confirmação -->
+                    <form method="post" action="../Controller/rota.php?acao=devolverEquipamento" style="display:inline;">
+                        <input type="hidden" name="idequipamento" value="<?= htmlspecialchars($equipamento['idequipamento']) ?>">
+                        <input type="hidden" name="quantidade_devolvida" value="<?= htmlspecialchars($equipamento['quantidade']) ?>"> <!-- Mudando para quantidade_devolvida -->
+                        <button type="button" onclick="confirmarDevolucao(this.form)">Devolvido</button>
+                    </form>
+                </td>
             </tr>
-            <?php if (!empty($equipamentosEmprestados)): ?>
-                <?php foreach ($equipamentosEmprestados as $equipamento): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($equipamento['idequipamento']) ?></td>
-                        <td><?= htmlspecialchars($equipamento['nome_equipamento']) ?></td>
-                        <td><?= htmlspecialchars($equipamento['quantidade']) ?></td>
-                        <td>
-                            <!-- Botão "Detalhes" que mostra informações adicionais -->
-                            <button onclick="mostrarDetalhes(<?= htmlspecialchars(json_encode($equipamento)) ?>)">Detalhes</button>
-                            
-                            <!-- Botão "Devolvido" com confirmação -->
-                            <form method="post" action="../Controller/rota.php?acao=devolverEquipamento" style="display:inline;">
-                                <input type="hidden" name="idequipamento" value="<?= htmlspecialchars($equipamento['idequipamento']) ?>">
-                                <input type="hidden" name="quantidade_devolvida" value="<?= htmlspecialchars($equipamento['quantidade']) ?>"> <!-- Mudando para quantidade_devolvida -->
-                                <button type="button" onclick="confirmarDevolucao(this.form)">Devolvido</button>
-                            </form>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="6">Não há equipamentos emprestados no momento.</td> <!-- Ajustando o colspan -->
+        </tr>
+    <?php endif; ?>
+</table>
 
-
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="4">Não há equipamentos emprestados no momento.</td>
-                </tr>
-            <?php endif; ?>
-        </table>
 
         <h2>Lista de Equipamentos</h2>
         <table>

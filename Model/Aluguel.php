@@ -150,7 +150,13 @@ class Aluguel {
 
     // Método para listar apenas as solicitações pendentes
     public static function listarSolicitacoesPendentes($conn) {
-        $sql = "SELECT * FROM aluguel WHERE status_aluguel = 'pendente'";
+        $sql = "SELECT aluguel.*, 
+                       usuario_comum.nome_usuario AS nome_usuario, 
+                       equipamentos.nome_equipamento AS nome_equipamento 
+                FROM aluguel 
+                JOIN usuario_comum ON aluguel.id_usuario_aluguel = usuario_comum.id_USUARIO_COMUM 
+                JOIN equipamentos ON aluguel.id_equip_aluguel = equipamentos.idequipamento
+                WHERE aluguel.status_aluguel = 'pendente'";
         $stmt = $conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -166,22 +172,29 @@ class Aluguel {
 
     // Método para listar todos os alugueis de um usuário específico
     public static function listarAlugueisPorUsuario($conn, $id_usuario) {
-        $sql = "SELECT * FROM aluguel WHERE id_usuario_aluguel = ?";
+        $sql = "SELECT aluguel.*, equipamentos.nome_equipamento AS nome_equipamento 
+                FROM aluguel 
+                JOIN equipamentos ON aluguel.id_equip_aluguel = equipamentos.idequipamento
+                WHERE aluguel.id_usuario_aluguel = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(1, $id_usuario);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Novo método: listar equipamentos emprestados (com detalhes do solicitante e equipamento)
     public static function listarEquipamentosEmprestados($conn) {
         $sql = "
-            SELECT * FROM aluguel WHERE status_aluguel = 'aprovado';
-";
+            SELECT aluguel.*, 
+                   aluguel.aluguel_data_saida AS aluguel_data_saida,
+                   usuario_comum.nome_usuario AS nome_usuario
+            FROM aluguel 
+            JOIN usuario_comum ON aluguel.id_usuario_aluguel = usuario_comum.id_USUARIO_COMUM
+            WHERE aluguel.status_aluguel = 'aprovado'";
         
         $stmt = $conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     public static function listarEquipamentosAprovados($conn) {
         $sql = "
         SELECT 

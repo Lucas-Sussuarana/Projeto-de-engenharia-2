@@ -226,7 +226,7 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
             <tbody>
                 <?php foreach ($alugueis as $aluguel): ?>
                     <tr>
-                        <td data-label="Equipamento"><?= htmlspecialchars($aluguel['id_equip_aluguel']) ?></td>
+                        <td data-label="Equipamento"><?= htmlspecialchars($aluguel['nome_equipamento']) ?></td>
                         <td data-label="Data de Saída"><?= htmlspecialchars($aluguel['aluguel_data_saida']) ?></td>
                         <td data-label="Data de Devolução"><?= htmlspecialchars($aluguel['aluguel_data_devolucao']) ?></td>
                         <td data-label="Status"><?= htmlspecialchars($aluguel['status_aluguel']) ?></td>

@@ -186,9 +186,7 @@
             </div>
             <div class="button cancel">
                 <button id="voltarButton" onclick="history.back()">Voltar</button>
-            </div>
-            <label id="confirmacao" class="confirmacao">Cadastro realizado com sucesso!</label>
-        </form>
+</form>
     </div>
 
     <script>
@@ -259,11 +257,6 @@
                 }
             });
 
-            // Exibição da confirmação ao submeter o formulário
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                confirmacaoLabel.style.display = 'inline';
-            });
         });
     </script>
 </body>
