@@ -1,4 +1,3 @@
-<!-- views/cadastrar_equipamento.php -->
 <?php
 session_start();
 
@@ -6,6 +5,8 @@ if (!isset($_SESSION['admin'])) {
     header('Location: login_adm.html');
     exit();
 }
+
+$id_adm = $_SESSION['admin']['id']; // Altere conforme sua estrutura de sessão
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +30,7 @@ if (!isset($_SESSION['admin'])) {
         }
         form {
             background-color: #ffffff;
-            padding: 30px; /* Preenchimento interno do formulário */
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             max-width: 600px;
@@ -44,8 +45,8 @@ if (!isset($_SESSION['admin'])) {
         input[type="date"],
         input[type="number"],
         textarea {
-            width: calc(100% - 24px); /* Largura total menos o padding */
-            padding: 12px; /* Preenchimento interno */
+            width: calc(100% - 24px);
+            padding: 12px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -57,6 +58,14 @@ if (!isset($_SESSION['admin'])) {
             border-color: #007BFF;
             outline: none;
         }
+        select {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
         button {
             background-color: #007BFF;
             color: white;
@@ -64,23 +73,18 @@ if (!isset($_SESSION['admin'])) {
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px; /* Margem acima do botão */
+            margin-top: 10px;
             transition: background-color 0.3s, transform 0.2s;
         }
         button:hover {
             background-color: #0056b3;
             transform: translateY(-2px);
         }
-        .back-button {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
+        .button-red {
+            background-color: #e91e63;
         }
-        .back-button:hover {
-            text-decoration: underline;
+        .button-red:hover {
+            background-color: #c2185b;
         }
     </style>
 </head>
@@ -91,30 +95,36 @@ if (!isset($_SESSION['admin'])) {
         <input type="text" id="nome" name="nome" required>
 
         <label for="tipo">Tipo do Equipamento:</label>
-        <input type="text" id="tipo" name="tipo" required>
+        <select id="tipo" name="tipo" required>
+            <option value="Desktop">Desktop</option>
+            <option value="Periférico">Periférico</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Outros">Outros</option>
+        </select>
 
         <label for="status">Status do Equipamento:</label>
-        <input type="text" id="status" name="status" required>
+        <select id="status" name="status" required>
+            <option value="Funcional">Funcional</option>
+            <option value="Não funcional">Não funcional</option>
+        </select>
 
         <label for="patrimonio">Número de Patrimônio:</label>
-        <input type="text" id="patrimonio" name="patrimonio" required>
+        <input type="text" id="patrimonio" name="patrimonio" required pattern="\d*" title="Apenas números são permitidos">
 
         <label for="obs">Observações:</label>
         <textarea id="obs" name="obs" rows="4"></textarea>
 
         <label for="id_adm">ID do Administrador:</label>
-        <input type="text" id="id_adm" name="id_adm" required>
+        <input type="text" id="id_adm" name="id_adm" value="<?php echo $id_adm; ?>" readonly required>
 
         <label for="data_entrada">Data de Entrada:</label>
-        <input type="date" id="data_entrada" name="data_entrada" required>
+        <input type="date" id="data_entrada" name="data_entrada" required max="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>">
 
         <label for="quantidade">Quantidade:</label>
         <input type="number" name="quantidade" id="quantidade" required min="1">
 
-        <!-- O botão está corretamente posicionado logo após o campo de quantidade -->
         <button type="submit">Cadastrar Equipamento</button>
+        <button type="button" onclick="window.location.href='adm.php';" class="button-red">Retornar</button>
     </form>
-
-    <a class="back-button" href="adm.php">Voltar para o Painel do Administrador</a>
 </body>
 </html>

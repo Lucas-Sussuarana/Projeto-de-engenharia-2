@@ -10,6 +10,8 @@ if (!isset($_SESSION['admin'])) {
     exit();
 }
 
+
+
 $equipamentoController = new EquipamentoController();
 $aluguelController = new AluguelController(); // Instanciando o controlador de aluguel
 
@@ -19,7 +21,8 @@ $equipamentos = $equipamentoController->listar();
 // Listando todas as requisições de aluguel pendentes
 $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
 
-// Listando todos os equipamentos emprestados
+// Listando todos os equipamentos emprestados aprovados
+$equipamentosEmprestados = $aluguelController->listarEquipamentosAprovados();
 ?>
 
 <!DOCTYPE html>
@@ -97,6 +100,7 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
                 <th>Observações</th>
                 <th>Data de Saída</th>
                 <th>Data de Devolução</th>
+                <th>Quantidade Solicitada</th> <!-- Nova coluna adicionada -->
                 <th>Status</th>
             </tr>
             <?php if (!empty($solicitacoesPendentes)): ?>
@@ -107,12 +111,15 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
                         <td><?= htmlspecialchars($solicitacao['obs_aluguel']) ?></td>
                         <td><?= htmlspecialchars($solicitacao['aluguel_data_saida']) ?></td>
                         <td><?= htmlspecialchars($solicitacao['aluguel_data_devolucao']) ?></td>
+                        <td><?= htmlspecialchars($solicitacao['quantidade_solicitada']) ?></td> <!-- Exibindo a quantidade solicitada -->
                         <td>
-                            <form method="post" action="../Controller/rota.php?acao=atualizarStatus">
+                            <form method="post" action="../Controller/rota.php?acao=aprovarSolicitacao">
+                                <input type="hidden" name="quantidade_solicitada" value="<?= htmlspecialchars($solicitacao['quantidade_solicitada']) ?>">
                                 <input type="hidden" name="idaluguel" value="<?= htmlspecialchars($solicitacao['idaluguel']) ?>">
                                 <select name="status">
                                     <option value="aprovado">Aprovar</option>
                                     <option value="recusado">Recusar</option>
+                                    <option value="entregue">Entregue</option> <!-- Opção para marcar como entregue -->
                                 </select>
                                 <button type="submit">Atualizar</button>
                             </form>
@@ -121,7 +128,7 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
- <td colspan="6">Não há requisições de aluguel no momento.</td>
+                    <td colspan="7">Não há requisições de aluguel no momento.</td>
                 </tr>
             <?php endif; ?>
         </table>
@@ -132,18 +139,27 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
             <tr>
                 <th>ID Equipamento</th>
                 <th>Nome do Equipamento</th>
-                <th>Quantidade</th>
+                <th>Quantidade Solicitada</th>
                 <th>Ações</th>
             </tr>
             <?php if (!empty($equipamentosEmprestados)): ?>
                 <?php foreach ($equipamentosEmprestados as $equipamento): ?>
                     <tr>
-                        <td><?= htmlspecialchars($equipamento['id_equipamento']) ?></td>
+                        <td><?= htmlspecialchars($equipamento['idequipamento']) ?></td>
                         <td><?= htmlspecialchars($equipamento['nome_equipamento']) ?></td>
                         <td><?= htmlspecialchars($equipamento['quantidade']) ?></td>
                         <td>
                             <!-- Botão "Detalhes" que mostra informações adicionais -->
                             <button onclick="mostrarDetalhes(<?= htmlspecialchars(json_encode($equipamento)) ?>)">Detalhes</button>
+                            
+                            <!-- Botão "Devolvido" com confirmação -->
+                            <form method="post" action="../Controller/rota.php?acao=devolverEquipamento" style="display:inline;">
+                                <input type="hidden" name="idequipamento" value="<?= htmlspecialchars($equipamento['idequipamento']) ?>">
+                                <input type="hidden" name="quantidade_devolvida" value="<?= htmlspecialchars($equipamento['quantidade']) ?>"> <!-- Mudando para quantidade_devolvida -->
+                                <button type="button" onclick="confirmarDevolucao(this.form)">Devolvido</button>
+                            </form>
+
+
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -160,6 +176,7 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Tipo</th>
+                <th>Quantidade</th>
                 <th>Status</th>
                 <th>Ações</th>
             </tr>
@@ -168,6 +185,7 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
                     <td><?= htmlspecialchars($equipamento->getId()) ?></td>
                     <td><?= htmlspecialchars($equipamento->getNome()) ?></td>
                     <td><?= htmlspecialchars($equipamento->getTipo()) ?></td>
+                    <td><?= htmlspecialchars($equipamento->getQuantidade()) ?></td>
                     <td><?= htmlspecialchars($equipamento->getStatus()) ?></td>
                     <td>
                         <button onclick="window.location.href='../Controller/EquipamentoController.php?acao=atualizar&id=<?= $equipamento->getId() ?>'">Atualizar</button>
@@ -179,14 +197,18 @@ $solicitacoesPendentes = $aluguelController->listarSolicitacoesPendentes();
 
         <script>
             function mostrarDetalhes(equipamento) {
-                alert("Solicitante: " + equipamento.solicitante + "\n" +
-                      "Tipo de Equipamento: " + equipamento.tipo_equipamento + "\n" +
+                alert("ID Equipamento: " + equipamento.idequipamento + "\n" +
+                      "Nome: " + equipamento.nome_equipamento + "\n" +
                       "Quantidade: " + equipamento.quantidade);
+            }
+
+            function confirmarDevolucao(form) {
+                if (confirm("Tem certeza de que deseja confirmar a devolução deste equipamento?")) {
+                    form.submit();
+                }
             }
         </script>
 
     </div>
 </body>
 </html>
-
-Se precisar de mais ajuda ou detalhes, fique à vontade para perguntar!

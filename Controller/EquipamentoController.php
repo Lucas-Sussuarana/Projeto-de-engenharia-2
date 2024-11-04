@@ -77,5 +77,111 @@ class EquipamentoController {
             }
         }
     }
+    
+    public function listarEquipamentosAprovados() {
+        return Aluguel::listarEquipamentosAprovados($this->db);
+    }
+
+    // Método para reduzir a quantidade do equipamento
+    public function reduzirQuantidade($idEquipamento, $quantidadeRequisitada) {
+        try {
+            $equipamento = Equipamento::buscarPorId($this->db, $idEquipamento);
+            
+            if ($equipamento) {
+                $quantidadeAtual = $equipamento->getQuantidade();
+
+                // Verifica se a quantidade atual é suficiente
+                if ($quantidadeAtual >= $quantidadeRequisitada) {
+                    $novaQuantidade = $quantidadeAtual - $quantidadeRequisitada;
+
+                    // Atualiza a quantidade no banco de dados
+                    $equipamento->setQuantidade($novaQuantidade);
+                    $equipamento->atualizar($this->db);
+
+                    header('Location: ../View/adm.php?mensagem=Quantidade atualizada com sucesso!');
+                    exit();
+                } else {
+                    throw new Exception("Quantidade solicitada excede a quantidade disponível.");
+                }
+            } else {
+                throw new Exception("Equipamento não encontrado.");
+            }
+        } catch (Exception $e) {
+            echo "Erro ao reduzir quantidade: " . $e->getMessage();
+        }
+    }
+
+    // Método para aumentar a quantidade do equipamento
+public function devolverEquipamento($idEquipamento, $quantidadeDevolvida) {
+    try {
+        $equipamento = Equipamento::buscarPorId($this->db, $idEquipamento);
+        
+        if ($equipamento) {
+            $quantidadeAtual = $equipamento->getQuantidade();
+            $novaQuantidade = $quantidadeAtual + $quantidadeDevolvida; // Aumenta a quantidade
+
+            // Atualiza a quantidade no banco de dados
+            $equipamento->setQuantidade($novaQuantidade);
+            $equipamento->atualizar($this->db);
+
+            header('Location: ../View/adm.php?mensagem=Devolução realizada com sucesso!');
+            exit();
+        } else {
+            throw new Exception("Equipamento não encontrado.");
+        }
+    } catch (Exception $e) {
+        echo "Erro ao devolver equipamento: " . $e->getMessage();
+    }
+}
+
+
+    // Atualiza a quantidade chamando o método reduzirQuantidade
+    public function atualizarQuantidade($idEquipamento, $quantidadeRequisitada) {
+        $this->reduzirQuantidade($idEquipamento, $quantidadeRequisitada);
+    }
+}
+
+// Lógica para determinar a ação com base no parâmetro 'acao' na URL
+if (isset($_GET['acao'])) {
+    $controller = new EquipamentoController();
+    $acao = $_GET['acao'];
+
+    switch ($acao) {
+        case 'cadastrar':
+            $controller->cadastrar();
+            break;
+
+        case 'listar':
+            $controller->listar();
+            break;
+
+        case 'remover':
+            if (isset($_GET['id'])) {
+                $controller->remover($_GET['id']);
+            } else {
+                echo "ID do equipamento não fornecido para remoção.";
+            }
+            break;
+
+        case 'atualizar':
+            if (isset($_GET['id'])) {
+                $controller->atualizar($_GET['id']);
+            } else {
+                echo "ID do equipamento não fornecido para atualização.";
+            }
+            break;
+
+        case 'atualizarQuantidade':
+            if (isset($_GET['idEquipamento']) && isset($_GET['quantidade'])) {
+                $controller->atualizarQuantidade($_GET['idEquipamento'], $_GET['quantidade']);
+            } else {
+                echo "ID do equipamento ou quantidade não fornecidos.";
+            }
+            break;
+
+        default:
+            echo "Ação não reconhecida.";
+            break;
+    }
 }
 ?>

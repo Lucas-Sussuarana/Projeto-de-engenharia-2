@@ -18,88 +18,113 @@ $aluguelController = new AluguelController();
 switch ($acao) {
     // Rotas para o Administrador
     case "cadastro":
-        // Redireciona para o formulário de cadastro (view)
         header('Location: ../View/cad_adm.php');
         break;
 
     case "cadastrar":
-        // Chama a função de cadastro do controlador
         $administradorController->cadastrar();
         break;
 
     case "login":
-        // Redireciona para o formulário de login (view)
         header('Location: ../View/login_adm.php');
         break;
 
     case "logar":
-        // Chama a função de login do controlador
         $administradorController->login();
         break;
 
     case "listarSolicitacoes":
-        // Chama a função para listar solicitações de aluguel pendentes
         $solicitacoesPendentes = $administradorController->listarSolicitacoesPendentes();
-        // Aqui você pode redirecionar para uma view que exibe as solicitações, se necessário
+        break;
+
+    case "aprovarSolicitacao":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id_aluguel = $_POST['idaluguel'];
+            $quantidade_solicitada = $_POST['quantidade_solicitada'];
+            $status = 'aprovado'; // Defina o status como aprovado
+            
+            $id_adm_aluguel = $_SESSION['admin']['id_usuario_administrador'];
+    
+            if (isset($id_adm_aluguel)) {
+                // Chama o método atualizarStatus do AluguelController
+                $aluguelController->atualizarStatusAluguel($id_aluguel, $status, $id_adm_aluguel, $quantidade_solicitada);
+            } else {
+                echo "Erro: Administrador não logado.";
+            }
+        }
         break;
 
     case "atualizarStatus":
-        // Chama a função para atualizar o status do aluguel
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_aluguel = $_POST['idaluguel'];
             $status = $_POST['status'];
-            $id_adm_aluguel = $_SESSION['admin']['id_usuario_administrador ']; // Supondo que você tenha isso na sessão
-            $administradorController->atualizarStatusAluguel($id_aluguel, $status, $id_adm_aluguel);
+            $quantidade_solicitada = $_POST['quantidade_solicitada'];
+            
+            $id_adm_aluguel = $_SESSION['admin']['id_usuario_administrador'];
+    
+            if (isset($id_adm_aluguel)) {
+                // Chama o método atualizarStatus do AluguelController, que internamente chama reduzirQuantidade
+                $aluguelController->atualizarStatusAluguel($id_aluguel, $status, $id_adm_aluguel, $quantidade_solicitada);
+            } else {
+                echo "Erro: Administrador não logado.";
+            }
         }
         break;
 
     // Rotas para Equipamentos
     case "cadEquipamento":
-        // Redireciona para o formulário de cadastro de equipamentos (view)
         header('Location: ../View/cadastrar.php');
         break;
 
     case "salvarEquipamento":
-        // Chama a função de salvar do controlador de equipamentos
-        $equipamentoController->cadastrar(); // Chama a função "cadastrar" definida no controlador
+        $equipamentoController->cadastrar();
         break;
 
     case "listarEquipamentos":
-        // Chama a função para listar equipamentos
         $equipamentoController->listar();
         break;
 
     // Rotas para Usuários
     case "cadUsuario":
-        // Redireciona para o formulário de cadastro de usuários (view)
         header('Location: ../View/cad_usuario.php');
         break;
 
     case "cadastrarUsuario":
-        // Chama a função de cadastro do controlador de usuários
         $usuarioController->cadastrar();
         break;
 
     case "loginUsuario":
-        // Redireciona para o formulário de login de usuários (view)
         header('Location: ../View/login_usuario.php');
         break;
 
     case "logarUsuario":
-        // Chama a função de login do controlador de usuários
         $usuarioController->login();
         break;
 
     // Rotas para Aluguel de Equipamentos
     case "solicitarAluguel":
-        // Chama a função para solicitar aluguel de equipamento
         $aluguelController->solicitarAluguel();
         break;
 
     case "listarAlugados":
-        // Chama a função para listar equipamentos alugados pelo usuário
         $equipamentosAlugados = $aluguelController->listarAlugados($_SESSION['usuario']['idusuario']);
         break;
+    
+    case "devolverEquipamento":
+            // Verifica se a ação solicitada é devolverEquipamento
+        if ($_GET['acao'] == 'devolverEquipamento') {
+            $idEquipamento = $_POST['idequipamento'];
+            $quantidadeSolicitada = $_POST['quantidade_solicitada'];
+
+            // Chamando o método para devolução
+            $aluguelController->devolverEquipamento($idEquipamento, $quantidadeSolicitada);
+            
+            // Redireciona de volta ao painel do administrador
+            header('Location: ../View/adm.php');
+            exit();
+        }
+        break;
+        
 
     default:
         echo "Ação não reconhecida.";

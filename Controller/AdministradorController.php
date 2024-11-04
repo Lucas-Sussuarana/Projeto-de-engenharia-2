@@ -86,32 +86,6 @@ class AdministradorController {
         }
     }
     
-    public function atualizarStatusAluguel() {
-        session_start(); // Inicia a sessão se não estiver ativa
-    
-        // Verifique se o administrador está logado
-        if (!isset($_SESSION['admin'])) {
-            echo "Administrador não logado.";
-            return;
-        }
-    
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id_aluguel = $_POST['idaluguel']; // Corrigido
-            $status = $_POST['status'];
-            $id_adm_aluguel = $_SESSION['admin']['id_administrador'];
-    
-            try {
-                // Atualiza o status do aluguel no banco de dados
-                Aluguel::atualizarStatus($this->db, $id_aluguel, $status, $id_adm_aluguel);
-                // Limpa o buffer de saída antes de redirecionar
-                ob_start();
-                header('Location: ../View/adm.php');
-                ob_end_flush();
-                exit();
-            } catch (Exception $e) {
-                echo "Erro ao atualizar o status: " . $e->getMessage();
-            }
-        }
-    }
+   
 }
 ?>

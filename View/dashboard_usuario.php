@@ -2,7 +2,7 @@
 require_once "../Conexao/Conexao.php";
 require_once "../Controller/EquipamentoController.php";
 require_once "../Controller/AluguelController.php";
-require_once "../Controller/UsuarioController.php"; // Inclua o controlador de usuário aqui
+require_once "../Controller/UsuarioController.php";
 session_start();
 
 if (!isset($_SESSION['usuario']['id_USUARIO_COMUM'])) {
@@ -10,11 +10,9 @@ if (!isset($_SESSION['usuario']['id_USUARIO_COMUM'])) {
     exit();
 }
 
-// Controlador de usuário para listar aluguéis
 $controller = new UsuarioController();
-$alugueis = $controller->listarAlugueisUsuario(); // Listar aluguéis do usuário logado
+$alugueis = $controller->listarAlugueisUsuario();
 
-// Controlador de equipamento para listar os equipamentos disponíveis
 $equipamentoController = new EquipamentoController();
 $equipamentos = $equipamentoController->listar();
 
@@ -28,27 +26,83 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard do Usuário</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Estilos gerais */
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         h1, h2 {
             color: #333;
+            margin-bottom: 15px;
         }
+
+        /* Estilos para o formulário */
+        form {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
         button {
-            margin: 5px;
-            padding: 10px 15px;
-            border: none;
             background-color: #007BFF;
             color: white;
-            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
             border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #0056b3;
         }
+
+        .clear-button {
+            background-color: #FF0000;
+            color: white;
+        }
+
+        /* Estilos para tabela */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -56,33 +110,68 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
             background-color: white;
         }
         th, td {
-            padding: 10px;
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
         th {
             background-color: #007BFF;
             color: white;
+            font-weight: bold;
         }
         tr:hover {
             background-color: #f1f1f1;
         }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .msg-success {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block;
+                width: 100%;
+            }
+            th, td {
+                text-align: right;
+            }
+            th::before, td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
         }
     </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const today = new Date().toISOString().split("T")[0];
+            const dataSaida = document.getElementById("data_saida");
+            const dataDevolucao = document.getElementById("data_devolucao");
+
+            dataSaida.setAttribute("min", today);
+            
+            dataSaida.addEventListener("change", function() {
+                dataDevolucao.setAttribute("min", dataSaida.value);
+            });
+
+            document.getElementById("clear-form").addEventListener("click", function(event) {
+                event.preventDefault();
+                document.querySelector("form").reset();
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario']['nome_usuario']) ?>!</h1>
 
         <?php if ($msg): ?>
-            <p style="color: green;"><?= htmlspecialchars($msg) ?></p>
+            <p class="msg-success"><?= htmlspecialchars($msg) ?></p>
         <?php endif; ?>
 
         <h2>Solicitar Aluguel de Equipamento</h2>
@@ -100,6 +189,9 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
                 <?php endforeach; ?>
             </select>
             
+            <label for="quantidade">Quantidade:</label>
+            <input type="number" name="quantidade" id="quantidade" min="1" placeholder="Informe a quantidade desejada" required>
+            
             <label for="obs_aluguel">Observações:</label>
             <input type="text" name="obs_aluguel" id="obs_aluguel" placeholder="Especifique o motivo do aluguel" required>
             
@@ -109,30 +201,39 @@ $msg = isset($_GET['msg']) ? $_GET['msg'] : '';
             <label for="data_devolucao">Data de Devolução:</label>
             <input type="date" name="aluguel_data_devolucao" id="data_devolucao" required>
             
-            <button type="submit">Solicitar Aluguel</button>
+            <button type="submit" onclick="confirmarDevolucao(this.form)">Solicitar Aluguel</button>
+            <button id="clear-form" class="clear-button">Limpar Campos</button>
         </form>
 
         <h2>Seus Equipamentos Alugados</h2>
-        <?php if (!empty($alugueis)): ?>
-            <table>
+        
+        <label for="items-per-page">Itens por página:</label>
+        <select id="items-per-page" onchange="updatePagination(this.value)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+        </select>
+
+        <table id="alugados-table">
+            <thead>
                <tr>
                     <th>Equipamento</th>
                     <th>Data de Saída</th>
                     <th>Data de Devolução</th>
                     <th>Status</th>
                 </tr>
+            </thead>
+            <tbody>
                 <?php foreach ($alugueis as $aluguel): ?>
                     <tr>
-                        <td><?= htmlspecialchars($aluguel['id_equip_aluguel']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['aluguel_data_saida']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['aluguel_data_devolucao']) ?></td>
-                        <td><?= htmlspecialchars($aluguel['status_aluguel']) ?></td> <!-- Exibindo o status do aluguel -->
+                        <td data-label="Equipamento"><?= htmlspecialchars($aluguel['id_equip_aluguel']) ?></td>
+                        <td data-label="Data de Saída"><?= htmlspecialchars($aluguel['aluguel_data_saida']) ?></td>
+                        <td data-label="Data de Devolução"><?= htmlspecialchars($aluguel['aluguel_data_devolucao']) ?></td>
+                        <td data-label="Status"><?= htmlspecialchars($aluguel['status_aluguel']) ?></td>
                     </tr>
                 <?php endforeach; ?>
-            </table>
-        <?php else: ?>
-            <p>Você não possui equipamentos alugados no momento.</p>
-        <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
