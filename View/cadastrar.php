@@ -67,6 +67,11 @@ $id_adm = $_SESSION['admin']['id_usuario_administrador']; // Altere conforme sua
             border-radius: 5px;
             transition: border-color 0.3s;
         }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
         button {
             background-color: #007BFF;
             color: white;
@@ -74,7 +79,6 @@ $id_adm = $_SESSION['admin']['id_usuario_administrador']; // Altere conforme sua
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
             transition: background-color 0.3s, transform 0.2s;
         }
         button:hover {
@@ -82,15 +86,18 @@ $id_adm = $_SESSION['admin']['id_usuario_administrador']; // Altere conforme sua
             transform: translateY(-2px);
         }
         .back-button {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
+            background-color: #e91e63;
+            color: white;
             text-decoration: none;
-            color: #007BFF;
+            padding: 12px 20px;
+            border-radius: 5px;
             font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s;
+            display: inline-block;
         }
         .back-button:hover {
-            text-decoration: underline;
+            background-color: #c2185b;
         }
     </style>
 </head>
@@ -115,7 +122,7 @@ $id_adm = $_SESSION['admin']['id_usuario_administrador']; // Altere conforme sua
         </select>
 
         <label for="patrimonio">Número de Patrimônio:</label>
-        <input type="text" id="patrimonio" name="patrimonio" required>
+        <input type="number" id="patrimonio" name="patrimonio" required>
 
         <label for="obs">Observações:</label>
         <textarea id="obs" name="obs" rows="4"></textarea>
@@ -124,14 +131,15 @@ $id_adm = $_SESSION['admin']['id_usuario_administrador']; // Altere conforme sua
         <input type="text" id="id_adm" name="id_adm" value="<?php echo $id_adm; ?>" readonly required>
 
         <label for="data_entrada">Data de Entrada:</label>
-        <input type="date" id="data_entrada" name="data_entrada" required>
-
+        <input type="date" id="data_entrada" name="data_entrada" required max="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>">
+        
         <label for="quantidade">Quantidade:</label>
         <input type="number" name="quantidade" id="quantidade" required min="1">
 
-        <button type="submit">Cadastrar Equipamento</button>
+        <div class="button-container">
+            <button type="submit">Cadastrar Equipamento</button>
+            <a class="back-button" href="adm.php">Voltar</a> <!-- Botão Voltar -->
+        </div>
     </form>
-
-    <a class="back-button" href="adm.php">Voltar para o Painel do Administrador</a>
 </body>
 </html>

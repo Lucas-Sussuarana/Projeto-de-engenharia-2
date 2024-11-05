@@ -74,6 +74,7 @@ switch ($acao) {
 
     case "cadastrarUsuario":
         $usuarioController->cadastrar();
+        
         break;
 
     case "loginUsuario":

@@ -27,7 +27,7 @@ class UsuarioController {
 
             try {
                 $usuario->cadastrar($this->db);
-                header('Location: ../View/login_usuario.php');
+                header('Location: ../View/adm.php');
                 exit();
             } catch (Exception $e) {
                 echo "Erro ao cadastrar usuário: " . $e->getMessage();

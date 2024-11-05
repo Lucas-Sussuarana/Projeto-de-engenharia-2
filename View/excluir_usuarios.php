@@ -27,7 +27,6 @@ if (isset($_GET['delete'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excluir Usuários</title>
     <style>
-        /* Estilos semelhantes aos da tela anterior */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -36,6 +35,21 @@ if (isset($_GET['delete'])) {
         }
         h1 {
             color: #333;
+            margin-bottom: 10px;
+        }
+        .voltar-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #e91e63;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .voltar-button:hover {
+            background-color: #c2185b;
         }
         table {
             width: 100%;
@@ -68,6 +82,8 @@ if (isset($_GET['delete'])) {
 <body>
     <div class="container">
         <h1>Excluir Usuários</h1>
+        <a href="adm.php" class="voltar-button">Voltar</a> 
+
         <table>
             <tr>
                 <th>ID</th>
